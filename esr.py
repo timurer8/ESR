@@ -1,4 +1,4 @@
-    # Версия v1.8.5-beta
+    # Версия v1.8.6-beta
     # 📦 Блок 1: Импорты, Инициализация и Конструктор GUI
 import sys, os, re, asyncio, threading, json, customtkinter as ctk, edge_tts, io
 from tkinter import filedialog, messagebox
@@ -13,7 +13,7 @@ ctk.set_default_color_theme("blue")
 class EdgeStreamReaderApp(ctk.CTk):
     def __init__(self):
         super().__init__()
-        self.title("ESR v1.8.5-beta - EdgeStream Reader [Релиз]")
+        self.title("ESR v1.8.6-beta - EdgeStream Reader [Релиз]")
         self.geometry("720x710")
         self.resizable(False, False)
         pygame.mixer.init()
@@ -30,10 +30,10 @@ class EdgeStreamReaderApp(ctk.CTk):
         self.voice_map = {
             "Дмитрий (Онлайн Edge)": "ru-RU-DmitryNeural",
             "Светлана (Онлайн Edge)": "ru-RU-SvetlanaNeural",
-            "Дарья (Офлайн SAPI5)": "TTS_MS_RU-RU_DARIYA_NATIVE",
+            "Светлана (Офлайн SAPI5)": "TTS_MS_RU-RU_SVETLANA_NATIVE",
             "Дмитрий (Офлайн SAPI5)": "TTS_MS_RU-RU_DMITRY_NATIVE",
-            "Екатерина (Офлайн SAPI5)": "TTS_MS_RU-RU_EKATERINA_NATIVE",
-            "Светлана (Офлайн SAPI5)": "TTS_MS_RU-RU_SVETLANA_NATIVE"
+            "Дарья (Офлайн SAPI5)": "TTS_MS_RU-RU_DARIYA_NATIVE",
+            "Екатерина (Офлайн SAPI5)": "TTS_MS_RU-RU_EKATERINA_NATIVE"
         }
         self.voice, self.speed, self.volume = "ru-RU-DmitryNeural", "0", "0"
         
@@ -46,7 +46,7 @@ class EdgeStreamReaderApp(ctk.CTk):
         # RAM-буфер: Хранилище аудио-потоков MP3/WAV в оперативной памяти без обращений к диску
         self.ram_cache = {} # Хранилище MP3-чанков в ОЗУ [chunk_idx: io.BytesIO]
         
-        # --- ИНИЦИАЛИЗАЦИЯ ДВИЖКА СЛОВАРЕЙ DEMAGOG v1.8.5 ---
+        # --- ИНИЦИАЛИЗАЦИЯ ДВИЖКА СЛОВАРЕЙ DEMAGOG v1.8.6 ---
         self.exact_replacements = {}  # Сюда будут динамически собираться активные точные правила
         self.regex_replacements = []  # Сюда будут собираться активные маски (*)
         self.all_dicts_database = {}
@@ -62,11 +62,11 @@ class EdgeStreamReaderApp(ctk.CTk):
             "RU_EDGE_new": False
         }
 
-        # --- БЛОК ЛОКАЛИЗАЦИИ ИНТЕРФЕЙСА v1.8.5 ---
+        # --- БЛОК ЛОКАЛИЗАЦИИ ИНТЕРФЕЙСА v1.8.6 ---
         self.lang = "RU"  # По умолчанию русский язык
         self.translations = {
             "RU": {
-                "title": "ESR v1.8.5-beta - EdgeStream Reader",
+                "title": "ESR v1.8.6-beta - EdgeStream Reader",
                 "btn_load": " 📁 Открыть книгу (.txt, .fb2)",
                 "btn_settings": " ⚙ Настройки",
                 "btn_bookmark": " + 🔖 Закладка",
@@ -90,7 +90,7 @@ class EdgeStreamReaderApp(ctk.CTk):
                 "lbl_bg": "Фон окна читаемого текста:",
                 "lbl_lang": "Язык интерфейса (Language):",
                 "btn_open_dict": " 🗂 Открыть пользовательский словарь",
-                "reader_title": "ESR v1.8.5-beta — Экран чтения",
+                "reader_title": "ESR v1.8.6-beta — Экран чтения",
                 "reader_bookmark": " 📍 Поставить закладку",
                 "progress_read": "Чтение чанков: ",
                 "progress_pause": "Пауза: ",
@@ -122,7 +122,7 @@ class EdgeStreamReaderApp(ctk.CTk):
                 "msg_empty_fields": "Поля ввода не могут быть пустыми!"
             },
             "EN": {
-                "title": "ESR v1.8.5-beta - EdgeStream Reader",
+                "title": "ESR v1.8.6-beta - EdgeStream Reader",
                 "btn_load": " 📁 Open Book (.txt, .fb2)",
                 "btn_settings": " ⚙ Settings",
                 "btn_bookmark": " + 🔖 Bookmark",
@@ -146,7 +146,7 @@ class EdgeStreamReaderApp(ctk.CTk):
                 "lbl_bg": "Text Window Background Color:",
                 "lbl_lang": "Interface Language:",
                 "btn_open_dict": " 🗂 Open User Pronunciation Dictionary",
-                "reader_title": "ESR v1.8.5-beta — Reader Screen",
+                "reader_title": "ESR v1.8.6-beta — Reader Screen",
                 "reader_bookmark": " 📍 Place Bookmark",
                 "progress_read": "Reading chunks: ",
                 "progress_pause": "Paused: ",
@@ -253,7 +253,7 @@ class EdgeStreamReaderApp(ctk.CTk):
         self.voice_combo.set("Дмитрий (Мужской)")
         self.voice_combo.pack(side="right", padx=15, pady=5)
 
-        # --- БЛОК ЧЕКБОКСОВ ДЛЯ СЛОВАРЕЙ DEMAGOG v1.8.5 ---
+        # --- БЛОК ЧЕКБОКСОВ ДЛЯ СЛОВАРЕЙ DEMAGOG v1.8.6 ---
         dict_frame = ctk.CTkFrame(self, fg_color="transparent")
         dict_frame.pack(pady=5, padx=20, fill="x")
         
@@ -378,7 +378,7 @@ class EdgeStreamReaderApp(ctk.CTk):
 
     def add_bookmark(self):
         """
-        v1.8.5: Регистрирует текущую позицию чтения в базе esr_bookmarks.json.
+        v1.8.6: Регистрирует текущую позицию чтения в базе esr_bookmarks.json.
         Поддерживает вызовы из главного окна и дочернего экрана суфлёра (ESRReaderWindow).
         Использует глобальный индекс чанка в ОЗУ для защиты от дублирования позиций.
         """
@@ -386,7 +386,7 @@ class EdgeStreamReaderApp(ctk.CTk):
             messagebox.showinfo("Инфо", "Текст для создания закладки отсутствует!")
             return
 
-        # === ИСПРАВЛЕННЫЙ ПЕРЕХВАТ ИЗ ОКНА ЧТЕНИЯ v1.8.5 ===
+        # === ИСПРАВЛЕННЫЙ ПЕРЕХВАТ ИЗ ОКНА ЧТЕНИЯ v1.8.6 ===
         if hasattr(self, '_reader_selected_text') and self._reader_selected_text:
             search_phrase = self._reader_selected_text[:70] # Берем уникальный кусок текста
             self._reader_selected_text = None # Сразу сбрасываем маркер
@@ -434,7 +434,7 @@ class EdgeStreamReaderApp(ctk.CTk):
                 "text": chunk_text[:60] + "..." if len(chunk_text) > 60 else chunk_text
             }
             
-            # === ИСПРАВЛЕНИЕ v1.8.5: Защита от KeyError, если книга открыта впервые ===
+            # === ИСПРАВЛЕНИЕ v1.8.6: Защита от KeyError, если книга открыта впервые ===
             if file_name not in bookmarks:
                 bookmarks[file_name] = []
             
@@ -503,7 +503,7 @@ class EdgeStreamReaderApp(ctk.CTk):
         )
         self.btn_del_bm.pack(pady=10)
 
-        # === ИСПРАВЛЕНИЕ v1.8.5: Вывод собранных закладок на экран ===
+        # === ИСПРАВЛЕНИЕ v1.8.6: Вывод собранных закладок на экран ===
         lines = []
         self.bm_index_map = {}
 
@@ -594,7 +594,7 @@ class EdgeStreamReaderApp(ctk.CTk):
                 else:
                     self.save_state()
 
-            # --- СИНХРОНИЗАЦИЯ ОКНА ЧТЕНИЯ v1.8.5 ---
+            # --- СИНХРОНИЗАЦИЯ ОКНА ЧТЕНИЯ v1.8.6 ---
             if hasattr(self, 'reader_win') and self.reader_win.winfo_exists():
                 self.reader_win.sync_with_active_chunk()
 
@@ -638,7 +638,7 @@ class EdgeStreamReaderApp(ctk.CTk):
                     with open(self.bookmarks_file, "w", encoding="utf-8") as f:
                         json.dump(all_bookmarks, f, ensure_ascii=False, indent=4)
 
-                    # === ИСПРАВЛЕНИЕ v1.8.5: Убираем неопределенный флаг success ===
+                    # === ИСПРАВЛЕНИЕ v1.8.6: Убираем неопределенный флаг success ===
                     messagebox.showinfo(self.tr("msg_success"), self.tr("msg_bm_deleted"))
 
                     # Закрываем окно закладок, чтобы обновить данные
@@ -686,7 +686,7 @@ class EdgeStreamReaderApp(ctk.CTk):
         tabview.add(tab_help_name)
         tabview.add(tab_about_name)
         
-        # --- ВКЛАДКА: ИНТЕРФЕЙС (ОПТИМИЗАЦИЯ СЕТКИ v1.8.5) ---
+        # --- ВКЛАДКА: ИНТЕРФЕЙС (ОПТИМИЗАЦИЯ СЕТКИ v1.8.6) ---
         # 1. Блок выбора языка
         lang_frame = ctk.CTkFrame(tabview.tab(tab_interface_name))
         lang_frame.pack(fill="x", padx=10, pady=2) # Уменьшен pady
@@ -709,7 +709,7 @@ class EdgeStreamReaderApp(ctk.CTk):
         theme_combo.set(self.theme)
         theme_combo.pack(padx=15, pady=2, anchor="w")
         
-        # 3. Блок выбора фона текста (Локализованный в v1.8.5)
+        # 3. Блок выбора фона текста (Локализованный в v1.8.6)
         bg_frame = ctk.CTkFrame(tabview.tab(tab_interface_name))
         bg_frame.pack(fill="x", padx=10, pady=2)
 
@@ -743,7 +743,7 @@ class EdgeStreamReaderApp(ctk.CTk):
         btn_open_dict = ctk.CTkButton(dict_frame, text=self.tr("btn_open_dict"), command=self.open_user_dictionary, width=220, height=26, fg_color="#10b981", hover_color="#059669")
         btn_open_dict.pack(padx=15, pady=4, anchor="w")
         
-        # --- ВКЛАДКА: ПОМОЩЬ (v1.8.5 — Интерактивные ссылки на README) ---
+        # --- ВКЛАДКА: ПОМОЩЬ (v1.8.6 — Интерактивные ссылки на README) ---
         help_box = ctk.CTkTextbox(tabview.tab(tab_help_name), width=380, height=260, font=("Arial", 12))
         help_box.pack(padx=5, pady=5, fill="both", expand=True)
 
@@ -815,7 +815,7 @@ class EdgeStreamReaderApp(ctk.CTk):
         # --- ВКЛАДКА: О ПРОГРАММЕ ---
         if self.lang == "RU":
             about_text = (
-                "Portable EdgeStream Reader (ESR) v1.8.5-beta\n"
+                "Portable EdgeStream Reader (ESR) v1.8.6-beta\n"
                 "Разработчик софта: timurer & Гай(AI Google) (2026)\n\n"
                 "----------------------------------------------------------------------\n"
                 "ЛИЦЕНЗИОННОЕ СОГЛАШЕНИЕ (MIT License):\n\n"
@@ -827,7 +827,7 @@ class EdgeStreamReaderApp(ctk.CTk):
             )
         else:
             about_text = (
-                "Portable EdgeStream Reader (ESR) v1.8.5-beta\n"
+                "Portable EdgeStream Reader (ESR) v1.8.6-beta\n"
                 "Software Developer: timurer & Guy(AI Google) (2026)\n\n"
                 "----------------------------------------------------------------------\n"
                 "LICENSE AGREEMENT (MIT License):\n\n"
@@ -878,7 +878,7 @@ class EdgeStreamReaderApp(ctk.CTk):
     def change_text_bg(self, choice):
         """
         Переключает цветовую палитру интерфейса (Стандартный, Сепия, OLED).
-        v1.8.5: Динамически транслирует выбранную схему (HEX-коды) в открытое 
+        v1.8.6: Динамически транслирует выбранную схему (HEX-коды) в открытое 
         окно чтения (ESRReaderWindow) для обеспечения визуальной синхронности окон.
         """
         if choice in ["«Книжная Сепия»", "Book Sepia"]:
@@ -898,7 +898,7 @@ class EdgeStreamReaderApp(ctk.CTk):
         self.text_area.configure(fg_color=fg, text_color=txt)
         self.text_area.tag_config("para_highlight", background=highlight_bg, foreground=highlight_fg)
 
-        # === ДОРАБОТКА v1.8.5: Перекраска дочернего окна чтения на лету ===
+        # === ДОРАБОТКА v1.8.6: Перекраска дочернего окна чтения на лету ===
         if hasattr(self, 'reader_win') and self.reader_win is not None and self.reader_win.winfo_exists():
             self.reader_win.reader_text.configure(fg_color=fg, text_color=txt)
             self.reader_win.configure(fg_color=ctk.ThemeManager.theme["CTkFrame"]["fg_color"] if ctk.get_appearance_mode() == "Light" else ctk.ThemeManager.theme["CTkFrame"]["top_highlight"])
@@ -925,13 +925,13 @@ class EdgeStreamReaderApp(ctk.CTk):
     #Что внутри: Полная интерактивная логика Toplevel-окна словаря, контекстные меню по правому клику мыши для ввода спецсимволов, пошаговое чтение/запись JSON-файла.
     # --- БЛОК 1.3: ИНТЕРФЕЙС И ЛОГИКА ПОЛЬЗОВАТЕЛЬСКОГО СЛОВАРЯ ---
     def open_user_dictionary(self):
-        # --- НОВАЯ СИНХРОНИЗАЦИЯ ОКН v1.8.5 ---
+        # --- НОВАЯ СИНХРОНИЗАЦИЯ ОКН v1.8.6 ---
         # Если окно настроек открыто, автоматически закрываем его перед открытием словаря
         if self.settings_window is not None and self.settings_window.winfo_exists():
             self.settings_window.destroy()
             self.settings_window = None # Очищаем ссылку для безопасности
 
-        # --- ЗАЩИТА v1.8.5: Гарантируем наличие переменной словаря ---
+        # --- ЗАЩИТА v1.8.6: Гарантируем наличие переменной словаря ---
         if not hasattr(self, 'user_dict'):
             self.user_dict = {}
             
@@ -944,7 +944,7 @@ class EdgeStreamReaderApp(ctk.CTk):
         self.dict_win.title(self.tr("dict_win_title")) 
         self.dict_win.geometry("450x480")
         
-        # --- УСТАНОВКА РОДНОЙ ИКОНКИ ДЛЯ ОКНА СЛОВАРЯ v1.8.5 ---
+        # --- УСТАНОВКА РОДНОЙ ИКОНКИ ДЛЯ ОКНА СЛОВАРЯ v1.8.6 ---
         if os.path.exists("icon.ico"):
             try:
                 self.dict_win.wm_iconbitmap("icon.ico")
@@ -1229,8 +1229,9 @@ class EdgeStreamReaderApp(ctk.CTk):
             r'\bнее\b': 'неё',
             r'\bчерт\b': 'чёрт',
         }
-        for pattern, repl in ee_replacements.items():
-            text = re.sub(pattern, repl, text)
+        # ОТКЛЮЧЕНО: чтобы вернуть, просто уберите решетки в начале строк
+        #for pattern, repl in ee_replacements.items():
+        #    text = re.sub(pattern, repl, text)
 
         # Математическая формула склонения числительных
         def get_declension(number_str, forms):
@@ -1287,7 +1288,7 @@ class EdgeStreamReaderApp(ctk.CTk):
         return text
 
     def load_demagog_dictionaries(self):
-        """Всеядный парсер v1.8.5: читает файлы баз в ОЗУ"""
+        """Всеядный парсер v1.8.6: читает файлы баз в ОЗУ"""
         import os
         import glob
 
@@ -1391,7 +1392,7 @@ class EdgeStreamReaderApp(ctk.CTk):
         # Нормализуем скрытые дефисы и символы тире
         text = text.replace("\u2011", "-").replace("‑", "-").replace("–", "-").replace("—", "-")
 
-        # --- МОДУЛЬ СЛОВАРЕЙ DEMAGOG v1.8.5 ---
+        # --- МОДУЛЬ СЛОВАРЕЙ DEMAGOG ---
         # 1. Сначала прогоняем регулярные выражения со звёздочками (*)
         if hasattr(self, 'regex_replacements') and self.regex_replacements:
             for pattern, replacement in self.regex_replacements:
@@ -1444,7 +1445,7 @@ class EdgeStreamReaderApp(ctk.CTk):
                         idx = e_idx
         # -------------------------------------
 
-        # --- ФИНАЛЬНЫЙ СУПЕР-НОРМАЛИЗАТОР ЧИСЛИТЕЛЬНЫХ ДЛЯ ДВИЖКОВ TTS v1.8.5 ---
+        # --- ФИНАЛЬНЫЙ СУПЕР-НОРМАЛИЗАТОР ЧИСЛИТЕЛЬНЫХ ДЛЯ ДВИЖКОВ TTS v1.8.6 ---
         # Этот блок перехватывает кривые компьютерные склейки словарей Demagog 
         # и превращает их в чистое, красивое человеческое произношение
         import re
@@ -1583,7 +1584,7 @@ class EdgeStreamReaderApp(ctk.CTk):
         threading.Thread(target=self._playlist_loop, args=(self,), daemon=True).start()
 
     def _get_formatted_speed(self):
-        """v1.8.5-beta: Переводит шаги от -10 до 10 в безопасный формат % для Edge-TTS"""
+        """v1.8.6-beta: Переводит шаги от -10 до 10 в безопасный формат % для Edge-TTS"""
         try:
             # Считаем процент отклонения: шаг +3 -> +30%
             step = int(self.speed)
@@ -1605,7 +1606,7 @@ class EdgeStreamReaderApp(ctk.CTk):
             return "+0%"
 
     def _get_sapi5_speed(self):
-        """v1.8.5-beta: Переводит шаги нашего ползунка (-10..10) в системный темп SAPI5 (-10..10)"""
+        """v1.8.6-beta: Переводит шаги нашего ползунка (-10..10) в системный темп SAPI5 (-10..10)"""
         try:
             # SAPI5 принимает чистые целые числа от -10 до 10 напрямую. Нам даже конвертировать не нужно!
             step = int(self.speed)
@@ -1650,47 +1651,39 @@ class EdgeStreamReaderApp(ctk.CTk):
         except Exception as e:
             print(f"[ОШИБКА СЕРВЕРА] Чанк {target_index} не загружен: {e}")
 
-    def _generate_audio_bytes_core(self, text, voice_name, loop=None):
+    def _generate_audio_bytes_core(self, text, voice_name, loop=None, is_export=False):
         text = str(text).strip()
         if not text: return b""
         
-        # Временная изоляция дефисов для защиты в регулярках словарей
         text = re.sub(r'(?<=[а-яА-ЯёЁ])-(?=[а-яА-ЯёЁ])', '\u2011', text)
         
-        # --- ЛЕНИВАЯ ПРЕДОБРАБОТКА МИКРО-ЧАНКА В ПРЕФЕТЧЕРЕ (0.001 сек) ---
         if hasattr(self, '_normalize_text_dictionaries'):
             text = self._normalize_text_dictionaries(text)
         if hasattr(self, '_clean_text_notepad_killer'):
             text = self._clean_text_notepad_killer(text)
             
-        # Возвращаем дефисы обратно перед отправкой в движки озвучки
         text = text.replace('\u2011', '-')
         
         target_id = self.voice_map.get(self.voice, self.voice)
         is_offline_mode = ("Офлайн" in str(self.voice) or "NATIVE" in str(target_id))
         
-        # --- КРИТИЧЕСКИЙ ФИКС ДЛЯ ОНЛАЙН ДВИЖКА EDGE-TTS ---
         if not is_offline_mode:
-            # Вычищаем спецсимволы словарей Demagog, которые вешают сервера Microsoft:
-            # 1. Удаляем знаки "+" перед гласными (маркеры ударений Demagog)
             text = re.sub(r'\+([а-яА-ЯёЁё])', r'\1', text)
-            # 2. Удаляем изолированные технические символы, знаки ударений (комбинируемые символы) и мусор
             text = text.replace("`", "").replace("'", "").replace("^", "").replace("_", "")
-            # 3. Убираем двойные пробелы, которые могли возникнуть после замен
             text = re.sub(r'\s+', ' ', text).strip()
-            
-            # Если после очистки чанк стал пустым или в нем нет букв/цифр — блокируем отправку
             if not text or not re.search(r'[\w\d]', text):
                 print("[ESR ЗАЩИТА]: Пропущен пустой/мусорный чанк для Edge-TTS.")
                 return b""
         
         import win32com.client
+        import struct
         
         if is_offline_mode:
             try:
                 speaker = win32com.client.Dispatch("SAPI.SpVoice")
                 mem_stream = win32com.client.Dispatch("SAPI.SpMemoryStream")
-                mem_stream.Format.Type = 34
+                
+                # Позволяем движку выбрать свой родной формат
                 speaker.AudioOutputStream = mem_stream
                 speaker.Rate = int(self.speed)
                 
@@ -1699,9 +1692,29 @@ class EdgeStreamReaderApp(ctk.CTk):
                     if target_id in voices.Item(idx).Id:
                         speaker.Voice = voices.Item(idx)
                         break
+                        
                 speaker.Speak(text)
-                audio_bytes = bytes(mem_stream.GetData())
-                return audio_bytes if audio_bytes else b""
+                pcm_bytes = bytes(mem_stream.GetData())
+                
+                if pcm_bytes:
+                    # --- УМНЫЙ ПАРСИНГ: Спрашиваем у Windows реальные параметры потока ---
+                    try:
+                        wav_fmt = mem_stream.Format.GetWaveFormatEx()
+                        s_rate, chans, bits = wav_fmt.SamplesPerSec, wav_fmt.Channels, wav_fmt.BitsPerSample
+                    except:
+                        s_rate, chans, bits = 22050, 1, 16 # Страховка
+                        
+                    data_size = len(pcm_bytes)
+                    byte_rate = s_rate * chans * (bits // 8)
+                    block_align = chans * (bits // 8)
+                    
+                    wav_header = struct.pack('<4sI4s4sIHHIIHH4sI',
+                        b'RIFF', 36 + data_size, b'WAVE', b'fmt ',
+                        16, 1, chans, s_rate, byte_rate, block_align, bits,
+                        b'data', data_size
+                    )
+                    return wav_header + pcm_bytes
+                return b""
             except Exception as e:
                 print(f"[ОШИБКА SAPI5]: {e}")
                 return b""
@@ -1709,10 +1722,7 @@ class EdgeStreamReaderApp(ctk.CTk):
             try:
                 import edge_tts
                 import time
-                
-                # Микро-задержка 0.15 сек для защиты от Rate Limit
                 time.sleep(0.15)
-                
                 safe_speed = f"{int(self.speed):+}%" if isinstance(self.speed, (int, float)) else "+0%"
                 communicate = edge_tts.Communicate(text, target_id, rate=safe_speed, volume="+0%")
                 
@@ -1726,34 +1736,65 @@ class EdgeStreamReaderApp(ctk.CTk):
                 if loop:
                     loop.run_until_complete(fetch_stream())
                 
-                # Если сервер вернул пустоту, принудительно вызываем ошибку для ухода в Fallback
                 if not audio_data:
                     raise RuntimeWarning("Сервер Edge вернул пустой аудио-поток.")
-                    
                 return audio_data
                 
             except Exception as e:
-                print(f"[Резерв ESR]: Онлайн-движок споткнулся ({e}). Переключаем чанк на Офлайн SAPI5...")
-                # --- АВАРИЙНЫЙ КАНАЛ (FALLBACK): Генерируем этот же чанк через локальный SAPI5 ---
-                try:
-                    import win32com.client
-                    speaker = win32com.client.Dispatch("SAPI.SpVoice")
-                    mem_stream = win32com.client.Dispatch("SAPI.SpMemoryStream")
-                    mem_stream.Format.Type = 34  # WAV PCM 22050Hz 16-bit Mono
-                    speaker.AudioOutputStream = mem_stream
+                # --- ЕСЛИ МЫ В РЕЖИМЕ ЭКСПОРТА, БЛОКИРУЕМ ПЕРЕХОД НА ОФЛАЙН ---
+                if is_export:
+                    print(f"[ЭКСПОРТ КРИТИКА]: Ошибка Edge-TTS ({e}). Fallback заблокирован.")
+                    return (b"", "EXPORT_FAIL")
                     
-                    # === ИСПРАВЛЕНИЕ v1.8.5-beta: Безопасный темп SAPI5 ===
+                print(f"[Резерв ESR]: Онлайн-движок споткнулся ({e}). Переключаем на Офлайн SAPI5...")
+                try:
+                    speaker = win32com.client.Dispatch("SAPI.SpVoice")
                     speaker.Rate = self._get_sapi5_speed()
                     
+                    target_offline = "DMITRY_NATIVE" if "Dmitry" in str(self.voice) else "SVETLANA_NATIVE"
+                    selected_voice = None
+                    voices = speaker.GetVoices()
+                    
+                    for idx in range(voices.Count):
+                        if target_offline in voices.Item(idx).Id.upper():
+                            selected_voice = voices.Item(idx)
+                            break
+                    if not selected_voice:
+                        for idx in range(voices.Count):
+                            vid = voices.Item(idx).Id.upper()
+                            if "RU-RU" in vid and "NATIVE" in vid:
+                                selected_voice = voices.Item(idx)
+                                break
+                    if selected_voice:
+                        speaker.Voice = selected_voice
+
+                    mem_stream = win32com.client.Dispatch("SAPI.SpMemoryStream")
+                    speaker.AudioOutputStream = mem_stream
                     speaker.Speak(text)
-                    audio_bytes = bytes(mem_stream.GetData())
-                    if audio_bytes:
-                        print("[Резерв ESR УСПЕХ]: Чанк успешно спасен локальным движком.")
-                        # Возвращаем кортеж (байты, флаг_формата), чтобы плеер знал, что это WAV
+                    
+                    pcm_bytes = bytes(mem_stream.GetData())
+                    
+                    if pcm_bytes:
+                        try:
+                            wav_fmt = mem_stream.Format.GetWaveFormatEx()
+                            s_rate, chans, bits = wav_fmt.SamplesPerSec, wav_fmt.Channels, wav_fmt.BitsPerSample
+                        except:
+                            s_rate, chans, bits = 22050, 1, 16
+                            
+                        data_size = len(pcm_bytes)
+                        byte_rate = s_rate * chans * (bits // 8)
+                        block_align = chans * (bits // 8)
+                        
+                        wav_header = struct.pack('<4sI4s4sIHHIIHH4sI',
+                            b'RIFF', 36 + data_size, b'WAVE', b'fmt ',
+                            16, 1, chans, s_rate, byte_rate, block_align, bits,
+                            b'data', data_size
+                        )
+                        audio_bytes = wav_header + pcm_bytes
+                        print("[Резерв ESR УСПЕХ]: Чанк спасен локально (ОЗУ).")
                         return (audio_bytes, "WAV")
                 except Exception as sapi_err:
-                    print(f"[КРИТИЧЕСКАЯ ОШИБКА РЕЗЕРВА]: Не удалось озвучить даже через SAPI5: {sapi_err}")
-                
+                    print(f"[КРИТИЧЕСКАЯ ОШИБКА РЕЗЕРВА]: {sapi_err}")
                 return (b"", "MP3")
 
     def _background_prefetch_loop(self):
@@ -1801,12 +1842,25 @@ class EdgeStreamReaderApp(ctk.CTk):
                     # Синтезируем аудио (онлайн или офлайн)
                     audio_bytes = self._generate_audio_bytes_core(p_text, self.voice, loop=loop)
                     
+                    # --- ИСПРАВЛЕНИЕ: Распаковка кортежа и сохранение флага формата ---
+                    is_rescued_pcm = False
+                    if isinstance(audio_bytes, tuple):
+                        is_rescued_pcm = True
+                        audio_bytes = audio_bytes[0]
+                    # ------------------------------------------------------------------
+
                     # Проверяем актуальность маркера после скачивания
                     if audio_bytes and len(audio_bytes) > 0 and next_target >= self.current_chunk_index:
                         # Записываем строго валидный, неповрежденный поток аудио
                         self.ram_cache[next_target] = io.BytesIO(audio_bytes)
-                        print(f"[УСПЕХ RAM v1.8.5] Чанк {next_target} успешно загружен в ОЗУ. ({len(audio_bytes)} байт)")
-                
+                        
+                        # Сохраняем информацию о том, что это спасенный PCM-чанк
+                        if not hasattr(self, 'ram_cache_formats'):
+                            self.ram_cache_formats = {}
+                        self.ram_cache_formats[next_target] = is_rescued_pcm
+                        
+                        print(f"[УСПЕХ RAM v1.8.6] Чанк {next_target} успешно загружен в ОЗУ. ({len(audio_bytes)} байт)")
+                        
                 # Микро-пауза цикла для разгрузки процессора
                 time.sleep(0.02)
             else:
@@ -1814,14 +1868,14 @@ class EdgeStreamReaderApp(ctk.CTk):
 
         loop.close()
 
-    # --- ОСНОВНОЙ ПЛЕЙЛИСТ-ЦИКЛ ВОСПРОИЗВЕДЕНИЯ ИЗ ОЗУ (ВЕРСИЯ 1.8.5 - FIX PROGRESS) ---
-    def _playlist_loop(self, *args):
+# --- ОСНОВНОЙ ПЛЕЙЛИСТ-ЦИКЛ ВОСПРОИЗВЕДЕНИЯ ИЗ ОЗУ (ВЕРСИЯ 1.8.6 - MONOLITH FIX) ---
         """
         Главный управляющий поток гибридного плеера (ОЗУ-ориентированный).
         Непрерывно опрашивает mixer, извлекает байты из self.ram_cache[idx], 
         автоматически переключает частоту звука под онлайн (MP3) или офлайн (PCM/WAV) движки
-        и координирует оранжевую подсветку текста в интерфейсе.
+        и координирует бирюзовую подсветку текста в интерфейсе.
         """
+    def _playlist_loop(self, *args):
         import time
         import pygame
         import io
@@ -1831,6 +1885,7 @@ class EdgeStreamReaderApp(ctk.CTk):
                 time.sleep(0.1)
                 continue
 
+            # Проверяем, свободен ли плеер (не играет ли сейчас звук)
             if not pygame.mixer.music.get_busy() and not pygame.mixer.get_busy():
                 idx = self.current_chunk_index
                 total_chunks = len(self.virtual_chunks) if hasattr(self, 'virtual_chunks') else 0
@@ -1838,82 +1893,65 @@ class EdgeStreamReaderApp(ctk.CTk):
                 if idx < total_chunks:
                     if idx in self.ram_cache:
                         try:
+                            # 1. Извлекаем сырые байты из кэша
                             bytes_stream = self.ram_cache[idx]
                             bytes_stream.seek(0)
                             raw_bytes = bytes_stream.getvalue()
 
                             if len(raw_bytes) > 0:
-                                # --- СИНХРОНИЗАЦИЯ ПОДСВЕТКИ С ЯДРОМ 1.7.0 ---
+                                # 2. Подсветка текста и интерфейса
                                 chunk_data = self.virtual_chunks[idx]
                                 if isinstance(chunk_data, tuple) and len(chunk_data) > 0:
                                     actual_para_idx = chunk_data[0]
                                     self.after(0, lambda p=actual_para_idx: self._highlight_paragraph_on_screen(p))
-                                # --------------------------------------------
 
-                                # --- ЖЕСТКИЙ ВОЗВРАТ АНИМАЦИИ ПРОГРЕСС-БАРА ЧТЕНИЯ ---
                                 if total_chunks > 0:
                                     progress_float = idx / total_chunks
                                     self.after(0, lambda p=progress_float, c=idx+1, t=total_chunks: 
                                         self._update_ui_progress(p, f"Чтение чанков: {int(p*100)}% ({c}/{t})"))
-                                # ----------------------------------------------------
 
-                                # --- ГИБРИДНЫЙ АУДИОПЛЕЕР С ПОДДЕРЖКОЙ PCM И MP3 ИЗ ОЗУ ---
+                                # 3. Умное определение формата (MP3 или спасенный WAV/PCM)
                                 target_id = self.voice_map.get(self.voice, self.voice) if hasattr(self, 'voice_map') else self.voice
-                                is_offline = "Офлайн" in str(self.voice) or "NATIVE" in str(self.voice) or "NATIVE" in str(target_id)
+                                is_native_offline = "Офлайн" in str(self.voice) or "NATIVE" in str(self.voice) or "NATIVE" in str(target_id)
                                 
-                                # === АКТУАЛИЗАЦИЯ v1.8.5-beta: Умный динамический реинит частоты ===
-                                is_offline = "Офлайн" in str(self.voice) or "NATIVE" in str(self.voice) or "NATIVE" in str(target_id)
-                                
-                                # Определяем целевую частоту: SAPI5 выдает 22050 Гц, онлайн Edge-TTS выдает 24000 Гц
-                                target_freq = 22050 if is_offline else 24000
-                                
-                                # Проверяем, совпадает ли текущая частота микшера с целевой
-                                current_mixer_freq = pygame.mixer.get_init()[0] if pygame.mixer.get_init() else None
-                                
-                                if current_mixer_freq != target_freq:
-                                    try:
-                                        if pygame.mixer.music.get_busy():
-                                            pygame.mixer.music.stop()
-                                        pygame.mixer.quit()
-                                        
-                                        # Инициализируем микшер под конкретный тип чанка
-                                        if is_offline:
-                                            pygame.mixer.init(frequency=22050, size=-16, channels=1)
-                                        else:
-                                            pygame.mixer.init(frequency=24000, size=-16, channels=2)
-                                    except Exception as init_err:
-                                        print(f"[ОШИБКА РЕИНИТА МИКСЕРА]: {init_err}")
+                                # Чанк является PCM, если выбран офлайн голос ИЛИ если префетчер пометил его как спасенный
+                                is_saved_pcm = getattr(self, 'ram_cache_formats', {}).get(idx, False)
+                                is_chunk_offline = is_native_offline or is_saved_pcm
 
-                                # Запускаем воспроизведение
+                                # 5. Запуск воспроизведения
                                 try:
-                                    if is_offline:
-                                        sound_obj = pygame.mixer.Sound(buffer=raw_bytes)
+                                    import time
+                                    if is_chunk_offline:
+                                        # Оборачиваем байты в io.BytesIO, чтобы Pygame понял точную длину и не повторял звук!
+                                        offline_stream = io.BytesIO(raw_bytes)
+                                        sound_obj = pygame.mixer.Sound(offline_stream)
                                         sound_obj.play()
                                         
-                                        # Ожидаем окончания проигрывания офлайн-звука
+                                        # Блокировка плеера до конца фразы
                                         while pygame.mixer.get_busy() and self.is_speaking and not self.is_paused:
                                             time.sleep(0.05)
                                     else:
-                                        play_stream = io.BytesIO(raw_bytes)
-                                        play_stream.seek(0)
-                                        pygame.mixer.music.load(play_stream)
+                                        self._active_play_stream = io.BytesIO(raw_bytes)
+                                        pygame.mixer.music.load(self._active_play_stream)
                                         pygame.mixer.music.play()
+                                        
+                                        # Блокировка плеера до конца фразы
+                                        while pygame.mixer.music.get_busy() and self.is_speaking and not self.is_paused:
+                                            time.sleep(0.05)
                                 except Exception as mix_err:
                                     print(f"[СБОЙ МИКСЕРА]: {mix_err}")
-                                # ------------------------------------------------------
 
+                                # 6. Увеличиваем индекс строго после того, как звук закончится
                                 if not self.is_paused:
                                     self.current_chunk_index += 1
-                                    # Если это офлайн (WAV/PCM), оставляем микропаузу для безопасности, онлайн гоним без задержек
-                                    if is_offline:
-                                        time.sleep(0.03)
                         except Exception as e:
                             print(f"[ОШИБКА ЦИКЛА ПЛЕЕРА]: {e}")
-                            time.sleep(0.05)
                 else:
-                    # Если дочитали до конца книги — плавно сбрасываем UI в 100%
                     self.after(0, lambda: self._update_ui_progress(1.0, "Завершено! 100%"))
-                    time.sleep(0.1)
+            
+            # Микро-пауза основного цикла
+            import time
+            time.sleep(0.05)
 
     # 📦 Блок 4: Подсветка текста, Управление кнопками и Экспорт MP3
     # Что внутри: Функции _highlight_paragraph_on_screen, toggle_pause, stop_speech, деструктор on_close и поабзацный метод сохранения export_mp3.
@@ -2094,29 +2132,53 @@ class EdgeStreamReaderApp(ctk.CTk):
                     for idx, para in enumerate(export_paragraphs):
                         p_text = self.optimize_text_pauses(para)
                         audio_bytes = self._generate_audio_bytes_core(p_text, self.voice, loop=loop)
+                        
                         if audio_bytes and len(audio_bytes) > 0:
                             ram_audio_chunks.append(audio_bytes)
                         
                         prog = int(((idx + 1) / total_p) * 100)
-                        # Обновляем текст прямо на кнопке экспорта, не трогая плеер
                         self.after(0, lambda p=prog: self.btn_export.configure(text=f"⚡ {p}%"))
                     
                     if ram_audio_chunks:
-                        raw_pcm_monolith = b"".join(ram_audio_chunks)
-                        with open(save_path, "wb") as outfile:
-                            outfile.write(create_wav_header(len(raw_pcm_monolith)))
-                            outfile.write(raw_pcm_monolith)
+                        import wave
+                        import io
+                        with wave.open(save_path, 'wb') as wav_out:
+                            with wave.open(io.BytesIO(ram_audio_chunks[0]), 'rb') as wav_in:
+                                wav_out.setnchannels(wav_in.getnchannels())
+                                wav_out.setsampwidth(wav_in.getsampwidth())
+                                wav_out.setframerate(wav_in.getframerate())
+                            
+                            for chunk_bytes in ram_audio_chunks:
+                                with wave.open(io.BytesIO(chunk_bytes), 'rb') as wav_in:
+                                    wav_out.writeframes(wav_in.readframes(wav_in.getnframes()))
                 else:
                     with open(save_path, "wb") as outfile:
                         for idx, para in enumerate(export_paragraphs):
                             p_text = self.optimize_text_pauses(para)
-                            audio_bytes = self._generate_audio_bytes_core(p_text, self.voice, loop=loop)
-                            if audio_bytes and len(audio_bytes) > 0:
-                                outfile.write(audio_bytes)
+                            
+                            chunk_success = False
+                            for attempt in range(4):
+                                audio_bytes = self._generate_audio_bytes_core(p_text, self.voice, loop=loop, is_export=True)
+                                
+                                if isinstance(audio_bytes, tuple) and audio_bytes[1] == "EXPORT_FAIL":
+                                    self.after(0, lambda a=attempt+1: self.btn_export.configure(text=f"Сеть... ({a}/3)"))
+                                    import time
+                                    time.sleep(3)
+                                    continue
+                                
+                                if audio_bytes and len(audio_bytes) > 0 and not isinstance(audio_bytes, tuple):
+                                    outfile.write(audio_bytes)
+                                    chunk_success = True
+                                    break
+                                    
+                            if not chunk_success:
+                                self.after(0, lambda: messagebox.showerror("Сбой Экспорта", "Интернет-соединение потеряно навсегда.\nЭкспорт остановлен, чтобы не склеивать MP3 с оффлайн-WAV."))
+                                return
                             
                             prog = int(((idx + 1) / total_p) * 100)
                             self.after(0, lambda p=prog: self.btn_export.configure(text=f"⚡ {p}%"))
 
+                # Восстановленные строки вывода сообщения об успехе
                 fmt_name = "WAV" if is_offline else "MP3"
                 self.after(0, lambda f=fmt_name: messagebox.showinfo("Успех ESR", f"Аудио успешно сохранено в файл ({f})!"))
             
@@ -2125,7 +2187,6 @@ class EdgeStreamReaderApp(ctk.CTk):
             finally:
                 ram_audio_chunks.clear()
                 self.is_exporting = False
-                # Возвращаем исходный текст кнопке
                 self.after(0, lambda: self.btn_export.configure(state="normal", text=" 💾 Сохранить Аудио"))
 
         threading.Thread(target=run_export, daemon=True).start()
@@ -2292,7 +2353,7 @@ class EdgeStreamReaderApp(ctk.CTk):
         self.reader_win = ESRReaderWindow(self, self.text_area)
 
     def _open_local_readme(self, filename):
-        """v1.8.5: Безопасный запуск локального файла разметки в ОС Windows по клику из GUI"""
+        """v1.8.6: Безопасный запуск локального файла разметки в ОС Windows по клику из GUI"""
         import os
         if os.path.exists(filename):
             try:
@@ -2311,12 +2372,12 @@ class ESRReaderWindow(ctk.CTkToplevel):
     главного окна и делегирует сохранение закладок через координатную карту инсерта.
     """
     def __init__(self, parent, main_text_area):
-        # Конструктор v1.8.5 с защитой от сброса иконки Toplevel в стандартное перо Tkinter
+        # Конструктор v1.8.6 с защитой от сброса иконки Toplevel в стандартное перо Tkinter
         super().__init__(parent)
         self.parent = parent
         self.main_text_area = main_text_area
         
-        self.title("ESR v1.8.5 — Экран чтения")
+        self.title("ESR v1.8.6 — Экран чтения")
         self.geometry("900x700")
         self.minsize(500, 400)
         
@@ -2366,7 +2427,7 @@ class ESRReaderWindow(ctk.CTkToplevel):
         # Синхронизируем положение при старте окна
         self.sync_with_active_chunk()
 
-        # === ДОРАБОТКА v1.8.5: Защита иконки окна чтения от сброса в дефолт ===
+        # === ДОРАБОТКА v1.8.6: Защита иконки окна чтения от сброса в дефолт ===
         if os.path.exists("icon.ico"):
             try:
                 self.wm_iconbitmap("icon.ico")
