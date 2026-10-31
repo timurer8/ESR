@@ -1,5 +1,5 @@
 ======================================================================
-PORTABLE EDGESTREAM READER (ESR) v1.8.5-beta — FINAL DOCUMENTATION
+PORTABLE EDGESTREAM READER (ESR) v1.8.6-beta — FINAL DOCUMENTATION
 ======================================================================
 Software Developers: timurer & Guy (Google AI)
 Release Date: July 2026
@@ -37,7 +37,7 @@ MP3 streams together for bulk exports.
 • BLOCK 5: JSON State Serialization Logic. Maintains and coldly restores 
 runtime metrics (file path, active pointer, system theme, color palettes, and tempo).
 
-3. KEY FEATURES & INNOVATIONS OF v1.8.5-beta
+3. KEY FEATURES & INNOVATIONS OF v1.8.6-beta
 • Universal Format Support: Direct extraction of raw files (.txt), 
 e-books (.fb2, .epub), and Microsoft Word files (.docx).
 • "Notepad++ Killer" Parsing: Intelligent structural optimization, stripping 
